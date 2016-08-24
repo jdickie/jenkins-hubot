@@ -1,0 +1,15 @@
+{
+  "JenkinsUrl": "http://localhost:8080",
+  "Jobs" : {
+    "stage1" : {
+      "jobPrefix" : "Stage1",
+      "all" : ["Stage1_WWW", "Stage1_Seamus"],
+      "www" : ["Stage1_WWW"],
+      "seamus" : ["Stage1_Seamus"]
+    }
+  },
+  "aws": {
+    "rgbFilename": "rgb.txt",
+    "envInfoFilename": "envinfo.txt"
+  }
+}
