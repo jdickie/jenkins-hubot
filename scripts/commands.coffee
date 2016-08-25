@@ -1,12 +1,14 @@
 JenkinsClient = require('../lib/jenkinsClient.js')
 BuildAsColor = require('../lib/BuildAsColor.js')
 UpdateFile = require('../lib/UpdateFile.js')
+TestReport = require('../lib/TestReport.js')
 lodash = require('lodash')
 config = require('config')
 
 buildAsColor = new BuildAsColor()
 fileUpdate = new UpdateFile()
 client = new JenkinsClient()
+report = new TestReport();
 
 module.exports = (robot) ->
 
@@ -17,7 +19,15 @@ module.exports = (robot) ->
 
     client.getMultiJobTestStatus ((err, results) ->
       if !lodash.isUndefined(results) && !lodash.isEmpty(results)
-        res.send(generateResponseMessage(results))
+        params =
+          environment: environment
+
+        report.getHighLevel ((err, txt) ->
+          if err
+            res.send(err)
+          else
+            res.send(txt)
+        ), results, params
       else
         res.send("/shrug hmmm I dunno")
     ), environment
@@ -32,7 +42,16 @@ module.exports = (robot) ->
 
     client.getMultiJobSubJobStatuses ((err, results) ->
       if !lodash.isUndefined(results) && !lodash.isEmpty(results)
-        res.send(generateResponseMessage(results))
+        params =
+          environment: environment
+          codebase: codebase
+
+        report.getHighLevel ((err, txt) ->
+          if err
+            res.send(err)
+          else
+            res.send(txt)
+        ), results, params
       else
         res.send("/shrug Sorry I didn't find anything on " + codebase + " for " + environment)
     ), environment, codebase
@@ -64,23 +83,4 @@ module.exports = (robot) ->
         res.send("/shrug Sorry I didn't find anything on " + codebase + " for " + environment)
     ), environment, codebase
 
-  generateResponseMessage = (results) ->
-    responseMsg = "Status: \n"
-    passing = 0
-    failing = 0
-    failingText = "Failing tests:\n"
 
-    lodash.forIn results, ((color, name) ->
-      if buildAsColor.getBoolean(color)
-        passing += 1
-      else
-        failing += 1
-        failingText += name + " :facepalm: \n"
-    )
-
-    percentPassing = (passing / (passing + failing)) * 100
-    responseMsg += percentPassing + "% passing"
-    if failing
-      responseMsg += "\n with these failing:\n" + failingText
-
-    return responseMsg

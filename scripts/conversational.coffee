@@ -1,22 +1,24 @@
 JenkinsClient = require('../lib/jenkinsClient.js')
 BuildAsColor = require('../lib/BuildAsColor.js')
 UpdateFile = require('../lib/UpdateFile.js')
+TestReport = require('../lib/TestReport.js')
 lodash = require('lodash')
 config = require('config')
 
 buildAsColor = new BuildAsColor()
 fileUpdate = new UpdateFile()
 client = new JenkinsClient()
+report = new TestReport();
 
 botStatuses = ["Super.", "Doing pretty well actually!", ":thumbsup:", ":green_apple:", ":green_heart:" ]
 greetings = ["Hello", "howdy", "Hey!", "Sup?", ":metal:", ":zzz:", "/giphy hey"]
 
 module.exports = (robot) ->
 
-  robot.respond /h(i|ello)/i, (res) ->
+  robot.respond /h(i|ello)[\sA-z\?]*|((S|s)up)[\sA-z\?]*/i, (res) ->
     res.send res.random greetings
 
-  robot.respond /how are you\?/i, (res) ->
+  robot.respond /how are you[\sA-z\?]*/i, (res) ->
     res.send res.random botStatuses
 
   robot.respond /how is ([A-z]+[0-9]?)[\?]*/i, (res) ->
@@ -26,7 +28,15 @@ module.exports = (robot) ->
 
     client.getMultiJobTestStatus ((err, results) ->
       if !lodash.isUndefined(results) && !lodash.isEmpty(results)
-        res.send(generateResonseMessage(results))
+        params =
+          environment: environment
+
+        report.getHighLevel ((err, txt) ->
+          if err
+            res.send(err)
+          else
+            res.send(txt)
+        ), results, params
       else
         res.send("/shrug hmmm I dunno")
     ), environment
@@ -41,7 +51,16 @@ module.exports = (robot) ->
 
     client.getMultiJobSubJobStatuses ((err, results) ->
       if !lodash.isUndefined(results) && !lodash.isEmpty(results)
-        res.send(generateResonseMessage(results))
+        params =
+          environment: environment
+          codebase: codebase
+
+        report.getHighLevel ((err, txt) ->
+          if err
+            res.send(err)
+          else
+            res.send(txt)
+        ), results, params
       else
         res.send("/shrug Sorry I didn't find anything on " + codebase + " for " + environment)
     ), environment, codebase
