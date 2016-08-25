@@ -21,6 +21,12 @@ module.exports = (robot) ->
   robot.respond /how are you[\sA-z\?]*/i, (res) ->
     res.send res.random botStatuses
 
+  robot.respond /ship it/i, (res) ->
+    res.send "OK! Taking down site and promoting build to live..."
+    setTimeout ->
+      res.send "Just kidding :badjokeeel:"
+    , 1000
+
   robot.respond /how is ([A-z]+[0-9]?)[\?]*/i, (res) ->
     environment = res.match[1]
     if lodash.isUndefined(config.get("Jobs." + environment + ".all"))

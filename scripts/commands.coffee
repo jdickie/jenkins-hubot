@@ -56,6 +56,25 @@ module.exports = (robot) ->
         res.send("/shrug Sorry I didn't find anything on " + codebase + " for " + environment)
     ), environment, codebase
 
+  robot.respond /(run|build) ([A-z]+) ([A-z\-]+[0-9]*) ([A-z0-9\-]+)/, (res) ->
+    codebase = res.match[2]
+    environment = res.match[3]
+    jobname = res.match[4]
+
+    params =
+      codebase: codebase
+      environment: environment
+      jobname: jobname
+
+    res.send("Running: " + jobname)
+    client.runJob ((err, data) ->
+      if err
+        console.log(err)
+        res.send("eh, couldn't do it")
+      else
+        console.log(data);
+        res.send("Job queued")
+    ), params
 
   robot.respond /lightshow ([A-z]+) ([A-z\-]+[0-9]*)/, (res) ->
     codebase = res.match[1]
@@ -67,6 +86,10 @@ module.exports = (robot) ->
 
     client.getMultiJobSubJobStatuses ((err, results) ->
       if !lodash.isUndefined(results) && !lodash.isEmpty(results)
+        params =
+          environment: environment
+          codebase: codebase
+
         fileUpdate.putRgbFile ((err) ->
           if err
             res.send(err)
@@ -78,9 +101,13 @@ module.exports = (robot) ->
             res.send(err)
           else
             res.send("updated environment text file")
-        ), environment
+        ), params
       else
         res.send("/shrug Sorry I didn't find anything on " + codebase + " for " + environment)
     ), environment, codebase
+
+
+  robot.respond /help/i, (res) ->
+    res.send("Here is a list of things you can ask me to do:\n\n" + "status [stage1|stage4|etc]\nstatus [www|seamus] [stage1|stage4|etc]\nrun/build [www|seamus] [stage1|stage4|etc] [jobName]")
 
 
