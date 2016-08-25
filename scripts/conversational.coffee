@@ -8,10 +8,16 @@ buildAsColor = new BuildAsColor()
 fileUpdate = new UpdateFile()
 client = new JenkinsClient()
 
+botStatuses = ["Super.", "Doing pretty well actually!", ":thumbsup:", ":green_apple:", ":green_heart:" ]
+greetings = ["Hello", "howdy", "Hey!", "Sup?", ":metal:", ":zzz:", "/giphy hey"]
+
 module.exports = (robot) ->
 
+  robot.respond /h(i|ello)/i, (res) ->
+    res.send res.random greetings
+
   robot.respond /how are you\?/i, (res) ->
-    res.send("Doing pretty well actually");
+    res.send res.random botStatuses
 
   robot.respond /how is ([A-z]+[0-9]?)[\?]*/i, (res) ->
     environment = res.match[1]

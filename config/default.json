@@ -6,6 +6,19 @@
       "all" : ["Stage1_WWW", "Stage1_Seamus"],
       "www" : ["Stage1_WWW"],
       "seamus" : ["Stage1_Seamus"]
+    },
+    "stage4": {
+      "jobPrefix": "Stage4",
+      "all": [
+        "Stage4_WWW",
+        "Stage4_Seamus"
+      ],
+      "www": [
+        "Stage4_WWW"
+      ],
+      "seamus": [
+        "Stage4_Seamus"
+      ]
     }
   },
   "aws": {
