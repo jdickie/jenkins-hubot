@@ -56,6 +56,23 @@ module.exports = (robot) ->
         res.send("/shrug Sorry I didn't find anything on " + codebase + " for " + environment)
     ), environment, codebase
 
+  robot.respond /job ([A-z]+) ([A-z\-]+[0-9]*) ([A-z0-9\-]+)/, (res) ->
+    params =
+      codebase: res.match[1]
+      environment: res.match[2]
+      name: res.match[3]
+
+    client.getStatusOneJob ((err, data) ->
+      if err
+        res.send("Whoops, something went wrong")
+      report.getSingleJobReport ((err, msg) ->
+        if err
+          res.send("Whoops something went wrong")
+
+        res.send(msg)
+      ), data
+    ), params
+
   robot.respond /(run|build) ([A-z]+) ([A-z\-]+[0-9]*) ([A-z0-9\-]+)/, (res) ->
     codebase = res.match[2]
     environment = res.match[3]
